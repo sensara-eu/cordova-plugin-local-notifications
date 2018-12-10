@@ -1,22 +1,10 @@
 
-<p align="left"><b><a href="https://github.com/katzer/cordova-plugin-local-notifications/tree/example-x">SAMPLE APP</a> :point_right:</b></p>
+<p align="left"><b><a href="https://github.com/sensara-eu/cordova-plugin-local-notifications/tree/example-x">SAMPLE APP</a> :point_right:</b></p>
 
 <br>
 
 <p align="center">
     <img src="images/logo.png">
-</p>
-
-<p align="center">
-    <a href="https://www.npmjs.com/package/cordova-plugin-local-notification">
-        <img src="https://badge.fury.io/js/cordova-plugin-local-notification.svg" alt="npm version" />
-    </a>
-    <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=L3HKQCD9UA35A "Donate once-off to this project using Paypal"">
-        <img src="https://img.shields.io/badge/paypal-donate-yellow.svg" alt="PayPayl donate button" />
-    </a>
-    <a href="https://opensource.org/licenses/Apache-2.0">
-        <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License" />
-    </a>
 </p>
 
 <br>
@@ -504,32 +492,11 @@ See the sample app for how to use them.
 
 ## Installation
 
-The plugin can be installed via [Cordova-CLI][CLI] and is publicly available on [NPM][npm].
+The plugin can be installed via [Cordova-CLI][CLI]
 
-Execute from the projects root folder:
+install the latest head version:
 
-    $ cordova plugin add cordova-plugin-local-notification
-
-Or install a specific version:
-
-    $ cordova plugin add cordova-plugin-local-notification@VERSION
-
-Or install the latest head version:
-
-    $ cordova plugin add https://github.com/katzer/cordova-plugin-local-notifications.git
-
-Or install from local source:
-
-    $ cordova plugin add <path> --nofetch --nosave --link
-
-
-## Contributing
-
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+    $ cordova plugin add https://github.com/sensara-eu/cordova-plugin-local-notifications.git
 
 
 ## License
