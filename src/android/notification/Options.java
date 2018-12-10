@@ -232,20 +232,20 @@ public final class Options {
      * The channel id of that notification.
      */
     String getChannel() {
-        // If channel is passed in or we have a low enough SDK for it not to matter, short-circuit.
-        if (!options.optString("channel").isEmpty() || SDK_INT < O) {
-            return options.optString("channel", DEFAULT_CHANNEL_ID);
-        }
-
         Uri soundUri = getSound();
         boolean hasSound = !isWithoutSound();
         boolean shouldVibrate = isWithVibration();
         CharSequence channelName = options.optString("channelName", null);
 
-        String channelId = Manager.getInstance(context).buildChannelWithOptions(soundUri, shouldVibrate,
-                hasSound, channelName);
+        if (!options.optString("channel").isEmpty() || SDK_INT < O) {
+            String channelId = options.optString("channel", DEFAULT_CHANNEL_ID);
+            Manager.getInstance(context).createChannel(channelId, channelName != null ? channelName : "default-channel-name",
+                    4, shouldVibrate, soundUri);
 
-        return channelId;
+            return channelId;
+        }
+
+        return Manager.getInstance(context).buildChannelWithOptions(soundUri, shouldVibrate, hasSound, channelName);
     }
 
     /**
