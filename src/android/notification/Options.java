@@ -27,8 +27,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationCompat.MessagingStyle.Message;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationCompat.MessagingStyle.Message;
 import android.support.v4.media.session.MediaSessionCompat;
 
 import org.json.JSONArray;
@@ -54,29 +54,29 @@ import static android.support.v4.app.NotificationCompat.VISIBILITY_PUBLIC;
 import static android.support.v4.app.NotificationCompat.VISIBILITY_SECRET;
 
 /**
- * Wrapper around the JSON object passed through JS which contains all
- * possible option values. Class provides simple readers and more advanced
- * methods to convert independent values into platform specific values.
+ * Wrapper around the JSON object passed through JS which contains all possible
+ * option values. Class provides simple readers and more advanced methods to
+ * convert independent values into platform specific values.
  */
 public final class Options {
     // Default Channel ID for SDK < 26
-    static final String DEFAULT_CHANNEL_ID = "channel-id-default";
+    static final String DEFAULT_CHANNEL_ID = "default-channel-id";
 
     // Silent channel
-    static final String CHANNEL_ID_SILENT = "channel-id-silent";
-    static final CharSequence CHANNEL_NAME_SILENT = "Silent Notifications";
+    static final String SILENT_CHANNEL_ID = "silent-channel-id";
+    static final CharSequence SILENT_CHANNEL_NAME = "Silent Notifications";
 
     // Vibrate only channel
-    static final String CHANNEL_ID_VIBRATE = "vibrate-channel-id";
-    static final CharSequence CHANNEL_NAME_VIBRATE = "Low Priority Notifications";
+    static final String VIBRATE_CHANNEL_ID = "vibrate-channel-id";
+    static final CharSequence VIBRATE_CHANNEL_NAME = "Low Priority Notifications";
 
     // Sound only channel
-    static final String CHANNEL_ID_SOUND = "sound-channel-id";
-    static final CharSequence CHANNEL_NAME_SOUND = "Medium Priority Notifications";
+    static final String SOUND_CHANNEL_ID = "sound-channel-id";
+    static final CharSequence SOUND_CHANNEL_NAME = "Medium Priority Notifications";
 
     // Sound and vibrate channel
-    static final String CHANNEL_ID_SOUND_VIBRATE = "sound-vibrate-channel-id";
-    static final CharSequence CHANNEL_NAME_SOUND_VIBRATE = "High Priority Notifications";
+    static final String SOUND_VIBRATE_CHANNEL_ID = "sound-vibrate-channel-id";
+    static final CharSequence SOUND_VIBRATE_CHANNEL_NAME = "High Priority Notifications";
 
     // Key name for bundled sound extra
     static final String EXTRA_SOUND = "NOTIFICATION_SOUND";
@@ -86,6 +86,16 @@ public final class Options {
 
     // Default icon path
     private static final String DEFAULT_ICON = "res://icon";
+
+    public final static Integer DEFAULT_RESET_DELAY = 5;
+
+    public final static Integer VOLUME_NOT_SET = -1;
+
+    // Default wakelock timeout
+    public final static Integer DEFAULT_WAKE_LOCK_TIMEOUT = 15000;
+
+    // Default icon type
+    private static final String DEFAULT_ICON_TYPE = "square";
 
     // The original JSON object
     private final JSONObject options;
@@ -104,7 +114,7 @@ public final class Options {
     public Options(JSONObject options) {
         this.options = options;
         this.context = null;
-        this.assets  = null;
+        this.assets = null;
     }
 
     /**
@@ -116,13 +126,13 @@ public final class Options {
     public Options(Context context, JSONObject options) {
         this.context = context;
         this.options = options;
-        this.assets  = AssetUtil.getInstance(context);
+        this.assets = AssetUtil.getInstance(context);
     }
 
     /**
      * Application context.
      */
-    public Context getContext () {
+    public Context getContext() {
         return context;
     }
 
@@ -215,10 +225,34 @@ public final class Options {
     }
 
     /**
+     * flag to auto-launch the application as the notification fires
+     */
+    public boolean isAutoLaunchingApp() {
+        return options.optBoolean("autoLaunch", true);
+    }
+
+    /**
      * wakeup flag for the notification.
      */
     public boolean shallWakeUp() {
         return options.optBoolean("wakeup", true);
+    }
+
+    /**
+     * Use a fullScreenIntent
+     */
+    public boolean useFullScreenIntent() { return options.optBoolean("fullScreenIntent", true); }
+
+    /**
+     * Whether or not to trigger a notification in the app.
+     */
+    public boolean triggerInApp() { return options.optBoolean("triggerInApp", false); }
+
+    /**
+     * Timeout for wakeup (only used if shallWakeUp() is true)
+     */
+    public int getWakeLockTimeout() {
+        return options.optInt("wakeLockTimeout", DEFAULT_WAKE_LOCK_TIMEOUT);
     }
 
     /**
@@ -232,10 +266,17 @@ public final class Options {
      * The channel id of that notification.
      */
     String getChannel() {
+        // If we have a low enough SDK for it not to matter,
+        // short-circuit.
+        if (SDK_INT < O) {
+            return DEFAULT_CHANNEL_ID;
+        }
+
         Uri soundUri = getSound();
         boolean hasSound = !isWithoutSound();
         boolean shouldVibrate = isWithVibration();
         CharSequence channelName = options.optString("channelName", null);
+        String channelId = options.optString("channelId", null);
 
         if (!options.optString("channel").isEmpty() || SDK_INT < O) {
             String channelId = options.optString("channel", DEFAULT_CHANNEL_ID);
@@ -270,8 +311,7 @@ public final class Options {
         String title = options.optString("title", "");
 
         if (title.isEmpty()) {
-            title = context.getApplicationInfo().loadLabel(
-                    context.getPackageManager()).toString();
+            title = context.getApplicationInfo().loadLabel(context.getPackageManager()).toString();
         }
 
         return title;
@@ -286,11 +326,9 @@ public final class Options {
 
         if (cfg instanceof String) {
             hex = options.optString("led");
-        } else
-        if (cfg instanceof JSONArray) {
+        } else if (cfg instanceof JSONArray) {
             hex = options.optJSONArray("led").optString(0);
-        } else
-        if (cfg instanceof JSONObject) {
+        } else if (cfg instanceof JSONObject) {
             hex = options.optJSONObject("led").optString("color");
         }
 
@@ -298,7 +336,7 @@ public final class Options {
             return 0;
 
         try {
-            hex      = stripHex(hex);
+            hex = stripHex(hex);
             int aRGB = Integer.parseInt(hex, 16);
 
             return aRGB + 0xFF000000;
@@ -356,9 +394,7 @@ public final class Options {
             hex = stripHex(hex);
 
             if (hex.matches("[^0-9]*")) {
-                return Color.class
-                        .getDeclaredField(hex.toUpperCase())
-                        .getInt(null);
+                return Color.class.getDeclaredField(hex.toUpperCase()).getInt(null);
             }
 
             int aRGB = Integer.parseInt(hex, 16);
@@ -394,12 +430,12 @@ public final class Options {
      */
     Bitmap getLargeIcon() {
         String icon = options.optString("icon", null);
-        Uri uri     = assets.parse(icon);
-        Bitmap bmp  = null;
+        Uri uri = assets.parse(icon);
+        Bitmap bmp = null;
 
         try {
             bmp = assets.getIconFromUri(uri);
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -407,18 +443,21 @@ public final class Options {
     }
 
     /**
+     * Type of the large icon.
+     */
+    String getLargeIconType() {
+        return options.optString("iconType", DEFAULT_ICON_TYPE);
+    }
+
+    /**
      * Small icon resource ID for the local notification.
      */
     int getSmallIcon() {
         String icon = options.optString("smallIcon", DEFAULT_ICON);
-        int resId   = assets.getResId(icon);
+        int resId = assets.getResId(icon);
 
         if (resId == 0) {
             resId = assets.getResId(DEFAULT_ICON);
-        }
-
-        if (resId == 0) {
-            resId = context.getApplicationInfo().icon;
         }
 
         if (resId == 0) {
@@ -426,6 +465,23 @@ public final class Options {
         }
 
         return resId;
+    }
+
+    /**
+     * Get the volume
+     */
+    public Integer getVolume() {
+        return options.optInt("alarmVolume", VOLUME_NOT_SET);
+    }
+
+    /**
+     * Returns the resetDelay until the sound changes revert back to the users
+     * settings.
+     *
+     * @return resetDelay
+     */
+    public Integer getResetDelay() {
+        return options.optInt("resetDelay", DEFAULT_RESET_DELAY);
     }
 
     /**
@@ -440,7 +496,7 @@ public final class Options {
      */
     public boolean isWithoutSound() {
         Object value = options.opt("sound");
-        return value == null || value.equals(false);
+        return value == null || value.equals(false) || options.optInt("alarmVolume") == 0;
     }
 
     /**
@@ -468,9 +524,9 @@ public final class Options {
     }
 
     /**
-     * Set the default notification options that will be used.
-     * The value should be one or more of the following fields combined with
-     * bitwise-or: DEFAULT_SOUND, DEFAULT_VIBRATE, DEFAULT_LIGHTS.
+     * Set the default notification options that will be used. The value should be
+     * one or more of the following fields combined with bitwise-or: DEFAULT_SOUND,
+     * DEFAULT_VIBRATE, DEFAULT_LIGHTS.
      */
     int getDefaults() {
         int defaults = options.optInt("defaults", 0);
@@ -483,15 +539,13 @@ public final class Options {
 
         if (isWithDefaultSound()) {
             defaults |= DEFAULT_SOUND;
-        } else
-        if (isWithoutSound()) {
+        } else if (isWithoutSound()) {
             defaults &= DEFAULT_SOUND;
         }
 
         if (isWithDefaultLights()) {
             defaults |= DEFAULT_LIGHTS;
-        } else
-        if (isWithoutLights()) {
+        } else if (isWithoutLights()) {
             defaults &= DEFAULT_LIGHTS;
         }
 
@@ -542,9 +596,7 @@ public final class Options {
      * If the notification shall display a progress bar.
      */
     boolean isWithProgressBar() {
-        return options
-                .optJSONObject("progressBar")
-                .optBoolean("enabled", false);
+        return options.optJSONObject("progressBar").optBoolean("enabled", false);
     }
 
     /**
@@ -553,9 +605,7 @@ public final class Options {
      * @return 0 by default.
      */
     int getProgressValue() {
-        return options
-                .optJSONObject("progressBar")
-                .optInt("value", 0);
+        return options.optJSONObject("progressBar").optInt("value", 0);
     }
 
     /**
@@ -564,9 +614,7 @@ public final class Options {
      * @return 100 by default.
      */
     int getProgressMaxValue() {
-        return options
-                .optJSONObject("progressBar")
-                .optInt("maxValue", 100);
+        return options.optJSONObject("progressBar").optInt("maxValue", 100);
     }
 
     /**
@@ -575,9 +623,7 @@ public final class Options {
      * @return false by default.
      */
     boolean isIndeterminateProgress() {
-        return options
-                .optJSONObject("progressBar")
-                .optBoolean("indeterminate", false);
+        return options.optJSONObject("progressBar").optBoolean("indeterminate", false);
     }
 
     /**
@@ -599,11 +645,11 @@ public final class Options {
     /**
      * Image attachments for image style notifications.
      *
-     * @return For now it only returns the first item as Android does not
-     *         support multiple attachments like iOS.
+     * @return For now it only returns the first item as Android does not support
+     *         multiple attachments like iOS.
      */
     List<Bitmap> getAttachments() {
-        JSONArray paths   = options.optJSONArray("attachments");
+        JSONArray paths = options.optJSONArray("attachments");
         List<Bitmap> pics = new ArrayList<Bitmap>();
 
         if (paths == null)
@@ -631,22 +677,20 @@ public final class Options {
      * Gets the list of actions to display.
      */
     Action[] getActions() {
-        Object value      = options.opt("actions");
-        String groupId    = null;
+        Object value = options.opt("actions");
+        String groupId = null;
         JSONArray actions = null;
         ActionGroup group = null;
 
         if (value instanceof String) {
             groupId = (String) value;
-        } else
-        if (value instanceof JSONArray) {
+        } else if (value instanceof JSONArray) {
             actions = (JSONArray) value;
         }
 
         if (groupId != null) {
             group = ActionGroup.lookup(groupId);
-        } else
-        if (actions != null && actions.length() > 0) {
+        } else if (actions != null && actions.length() > 0) {
             group = ActionGroup.parse(context, actions);
         }
 
@@ -670,13 +714,13 @@ public final class Options {
             return null;
 
         Message[] messages = new Message[list.length()];
-        long now           = new Date().getTime();
+        long now = new Date().getTime();
 
         for (int i = 0; i < messages.length; i++) {
             JSONObject msg = list.optJSONObject(i);
             String message = msg.optString("message");
             long timestamp = msg.optLong("date", now);
-            String person  = msg.optString("person", null);
+            String person = msg.optString("person", null);
 
             messages[i] = new Message(message, timestamp, person);
         }
