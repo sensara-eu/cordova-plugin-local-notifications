@@ -44,14 +44,10 @@ import de.appplant.cordova.plugin.badge.BadgeImpl;
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.M;
 import static android.os.Build.VERSION_CODES.O;
-<<<<<<< HEAD
-import static android.support.v4.app.NotificationManagerCompat.IMPORTANCE_DEFAULT;
-import static android.support.v4.app.NotificationManagerCompat.IMPORTANCE_HIGH;
-import static android.support.v4.app.NotificationManagerCompat.IMPORTANCE_LOW;
-=======
 import static android.os.Build.VERSION_CODES.S;
 import static androidx.core.app.NotificationManagerCompat.IMPORTANCE_DEFAULT;
->>>>>>> upstream/master
+import static androidx.core.app.NotificationManagerCompat.IMPORTANCE_HIGH;
+import static androidx.core.app.NotificationManagerCompat.IMPORTANCE_LOW;
 import static de.appplant.cordova.plugin.notification.Notification.PREF_KEY_ID;
 import static de.appplant.cordova.plugin.notification.Notification.Type.TRIGGERED;
 
@@ -78,7 +74,7 @@ public final class Manager {
      */
     private Manager(Context context) {
         this.context = context;
-        createDefaultChannel();
+        createChannel(CHANNEL_ID, CHANNEL_NAME, IMPORTANCE_DEFAULT, false, Uri.EMPTY);
     }
 
     /**
@@ -126,9 +122,16 @@ public final class Manager {
     }
 
     /**
-     * TODO: temporary
+     * Build channel with options
+     *
+     * @param soundUri      Uri for custom sound (empty to use default)
+     * @param shouldVibrate whether not vibration should occur during the
+     *                      notification
+     * @param hasSound      whether or not sound should play during the notification
+     * @param channelName   the name of the channel (null will pick an appropriate
+     *                      default name for the options provided).
+     * @return channel ID of newly created (or reused) channel
      */
-<<<<<<< HEAD
     public String buildChannelWithOptions(Uri soundUri, boolean shouldVibrate, boolean hasSound,
                                           CharSequence channelName, String channelId) {
         String defaultChannelId, newChannelId;
@@ -170,22 +173,25 @@ public final class Manager {
      */
     public void createChannel(String channelId, CharSequence channelName, int importance,
                               Boolean shouldVibrate, Uri soundUri) {
-=======
-    @SuppressLint("WrongConstant")
-    private void createDefaultChannel() {
->>>>>>> upstream/master
         NotificationManager mgr = getNotMgr();
 
         if (SDK_INT < O)
             return;
 
-        NotificationChannel channel = mgr.getNotificationChannel(CHANNEL_ID);
+        NotificationChannel channel = mgr.getNotificationChannel(channelId);
 
         if (channel != null)
             return;
 
-        channel = new NotificationChannel(
-                CHANNEL_ID, CHANNEL_NAME, IMPORTANCE_DEFAULT);
+        channel = new NotificationChannel(channelId, channelName, importance);
+
+        channel.enableVibration(shouldVibrate);
+
+        if (!soundUri.equals(Uri.EMPTY)) {
+            AudioAttributes attributes = new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                    .build();
+            channel.setSound(soundUri, attributes);
+        }
 
         mgr.createNotificationChannel(channel);
     }
