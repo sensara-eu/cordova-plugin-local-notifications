@@ -61,6 +61,23 @@ import static androidx.core.app.NotificationCompat.VISIBILITY_SECRET;
  * methods to convert independent values into platform specific values.
  */
 public final class Options {
+    static final String DEFAULT_CHANNEL_ID = "default-channel-id";
+
+    // Silent channel
+    static final String SILENT_CHANNEL_ID = "silent-channel-id";
+    static final CharSequence SILENT_CHANNEL_NAME = "Silent Notifications";
+
+    // Vibrate only channel
+    static final String VIBRATE_CHANNEL_ID = "vibrate-channel-id";
+    static final CharSequence VIBRATE_CHANNEL_NAME = "Low Priority Notifications";
+
+    // Sound only channel
+    static final String SOUND_CHANNEL_ID = "sound-channel-id";
+    static final CharSequence SOUND_CHANNEL_NAME = "Medium Priority Notifications";
+
+    // Sound and vibrate channel
+    static final String SOUND_VIBRATE_CHANNEL_ID = "sound-vibrate-channel-id";
+    static final CharSequence SOUND_VIBRATE_CHANNEL_NAME = "High Priority Notifications";
 
     // Key name for bundled sound extra
     static final String EXTRA_SOUND = "NOTIFICATION_SOUND";
