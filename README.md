@@ -30,9 +30,8 @@
 
 ### Supported platforms
 
-- Android 4.4+
+- Android 7.0+
 - iOS 10+
-- Windows 10
 
 <br>
 <br>
@@ -41,15 +40,13 @@
 
 Please make sure that you always read the tagged README for the version you're using.
 
-See the _0.8_ branch if you cannot upgrade. Further development for `v0.9-beta` will happen here. The `0.9-dev` and `ios10` branches are obsolate and will be removed soon.
+Please report bugs or missing features.
 
-__Known issues__
+## Lacking features
 
-- Support for Android Oreo is limited yet.
-- v0.9 and v0.8 aren't compatible with each other (Wont fix)
+### Android
 
-Please report bugs or missing features!
-
+- Channels are not configurable. A default channel will be created with [IMPORTANCE_DEFAULT](https://developer.android.com/reference/android/app/NotificationManager#IMPORTANCE_DEFAULT), the id `default-channel-id` and the name `Default channel`. The name ist not translatable.
 
 ## Basics
 
@@ -78,15 +75,48 @@ cordova.plugins.notification.local.schedule([
 
 ## Properties
 
-A notification does have a set of configurable properties. Not all of them are supported across all platforms.
+A notification does have a set of configurable properties.
 
-| Property      | Property      | Property      | Property      | Property      | Property      | Property      | Property      | Property      |
-| :------------ | :------------ | :------------ | :------------ | :------------ | :------------ | :------------ | :------------ | :------------ |
-| id            | data          | timeoutAfter  | summary       | led           | clock         | channelName       | actions       | alarmVolume   |
-| text          | icon          | attachments   | smallIcon     | color         | defaults      | launch        | groupSummary  | resetDelay    |
-| title         | silent        | progressBar   | sticky        | vibrate       | priority      | mediaSession  | foreground    | autoLaunch    |
-| sound         | trigger       | group         | autoClear     | lockscreen    | number        | badge         | wakeup        | channelId     |
-| iconType      | wakeLockTimeout | triggerInApp | fullScreenIntent
+<b>Not all of them are supported across all platforms.</b>
+
+<i>The table is not complete regarding the support.</i>
+
+
+| Property      | Android | iOS | Comment                   |
+| :------------ | :-------| :-- | :------------------------ |
+| actions       |         |     |                           |
+| attachments   |         |     |                           |
+| autoClear     |         |     |                           |
+| badge         |         |     |                           |
+| channel       | x       | -   | Don't use it, it is not functional. Since Android 8: Channel-ID of the chanel. In the future it will be renamed to channelId |
+| clock         |         |     |                           |
+| color         |         |     |                           |
+| data          |         |     |                           |
+| defaults      |         |     |                           |
+| foreground    |         |     |                           |
+| group         |         |     |                           |
+| groupSummary  |         |     |                           |
+| icon          |         |     |                           |
+| iconType      |         |     |                           |
+| id            |         |     |                           |
+| launch        |         |     |                           |
+| led           |         |     |                           |
+| lockscreen    |         |     |                           |
+| mediaSession  |         |     |                           |
+| number        |         |     |                           |
+| priority      |         |     |                           |
+| progressBar   | x       | -   | Natively not supported by iOS, [see Stackoverflow](https://stackoverflow.com/questions/48500532/progress-view-in-local-notification/48500734#48500734) |
+| silent        |         |     |                           |
+| smallIcon     |         |     |                           |
+| sound         | (x)     | (x) | Property available but not useable. Cannot used to play a sound file. In Android it's only possible up to Android 7.1. Since Android 8, the channels take precedence and a channel would have to be created with a sound file, but this is not implemented yet. In iOS it would be possible, but must be implemented too. |
+| sticky        |         |     |                           |
+| summary       |         |     |                           |
+| text          |         |     |                           |
+| timeoutAfter  |         |     |                           |
+| title         |         |     |                           |
+| trigger       |         |     |                           |
+| vibrate       |         |     |                           |
+| wakeup        |         |     |                           |
 
 For their default values see:
 
@@ -123,8 +153,6 @@ cordova.plugins.notification.local.schedule({
     <img width="31%" src="images/android-actions.png">
     &nbsp;&nbsp;&nbsp;&nbsp;
     <img width="31%" src="images/ios-actions.png">
-    &nbsp;&nbsp;&nbsp;&nbsp;
-    <img width="31%" src="images/windows-actions.png">
 </p>
 
 ### Input
@@ -170,19 +198,19 @@ cordova.plugins.notification.local.schedule({
 
 Actions do have a set of configurable properties. Not all of them are supported across all platforms.
 
-| Property     | Type         | Android | iOS | Windows |
-| :----------- | :----------- | :------ | :-- | :------ |
-| id           | button+input | x       | x   | x       |
-| title        | button+input | x       | x   | x       |
-| launch       | button+input | x       | x   | x       |
-| ui           | button+input |         | x   |         |
-| needsAuth    | button+input |         | x   |         |
-| icon         | button+input | x       |     |         |
-| emptyText    | input        | x       | x   | x       |
-| submitTitle  | input        |         | x   |         |
-| editable     | input        | x       |     |         |
-| choices      | input        | x       |     |         |
-| defaultValue | input        |         |     | x       |
+| Property     | Type         | Android | iOS |
+| :----------- | :----------- | :------ | :-- |
+| id           | button+input | x       | x   |
+| title        | button+input | x       | x   |
+| launch       | button+input | x       | x   |
+| ui           | button+input |         | x   |
+| needsAuth    | button+input |         | x   |
+| icon         | button+input | x       |     |
+| emptyText    | input        | x       | x   |
+| submitTitle  | input        |         | x   |
+| editable     | input        | x       |     |
+| choices      | input        | x       |     |
+| defaultValue | input        |         |     |
 
 
 ## Triggers
@@ -248,45 +276,45 @@ cordova.plugins.notification.local.schedule({
 
 The properties depend on the trigger type. Not all of them are supported across all platforms.
 
-| Type         | Property      | Type    | Value            | Android | iOS | Windows |
-| :----------- | :------------ | :------ | :--------------- | :------ | :-- | :------ |
+| Type         | Property      | Type    | Value            | Android | iOS |
+| :----------- | :------------ | :------ | :--------------- | :------ | :-- |
 | Fix          |
-|              | at            | Date    |                  | x       | x   | x       |
+|              | at            | Date    |                  | x       | x   |
 | Timespan     |
-|              | in            | Int     |                  | x       | x   | x       |
-|              | unit          | String  | `second`         | x       | x   | x       |
-|              | unit          | String  | `minute`         | x       | x   | x       |
-|              | unit          | String  | `hour`           | x       | x   | x       |
-|              | unit          | String  | `day`            | x       | x   | x       |
-|              | unit          | String  | `week`           | x       | x   | x       |
-|              | unit          | String  | `month`          | x       | x   | x       |
-|              | unit          | String  | `quarter`        | x       | x   | x       |
-|              | unit          | String  | `year`           | x       | x   | x       |
+|              | in            | Int     |                  | x       | x   |
+|              | unit          | String  | `second`         | x       | x   |
+|              | unit          | String  | `minute`         | x       | x   |
+|              | unit          | String  | `hour`           | x       | x   |
+|              | unit          | String  | `day`            | x       | x   |
+|              | unit          | String  | `week`           | x       | x   |
+|              | unit          | String  | `month`          | x       | x   |
+|              | unit          | String  | `quarter`        | x       | x   |
+|              | unit          | String  | `year`           | x       | x   |
 | Repeat       |
-|              | count         | Int     |                  | x       |     | x       |
-|              | every         | String  | `minute`         | x       | x   | x       |
-|              | every         | String  | `hour`           | x       | x   | x       |
-|              | every         | String  | `day`            | x       | x   | x       |
-|              | every         | String  | `week`           | x       | x   | x       |
-|              | every         | String  | `month`          | x       | x   | x       |
-|              | every         | String  | `quarter`        | x       |     | x       |
-|              | every         | String  | `year`           | x       | x   | x       |
-|              | before        | Date    |                  | x       |     | x       |
-|              | firstAt       | Date    |                  | x       |     | x       |
+|              | count         | Int     |                  | x       |     |
+|              | every         | String  | `minute`         | x       | x   |
+|              | every         | String  | `hour`           | x       | x   |
+|              | every         | String  | `day`            | x       | x   |
+|              | every         | String  | `week`           | x       | x   |
+|              | every         | String  | `month`          | x       | x   |
+|              | every         | String  | `quarter`        | x       |     |
+|              | every         | String  | `year`           | x       | x   |
+|              | before        | Date    |                  | x       |     |
+|              | firstAt       | Date    |                  | x       |     |
 | Match        |
-|              | count         | Int     |                  | x       |     | x       |
-|              | every         | Object  | `minute`         | x       | x   | x       |
-|              | every         | Object  | `hour`           | x       | x   | x       |
-|              | every         | Object  | `day`            | x       | x   | x       |
-|              | every         | Object  | `weekday`        | x       | x   | x       |
+|              | count         | Int     |                  | x       |     |
+|              | every         | Object  | `minute`         | x       | x   |
+|              | every         | Object  | `hour`           | x       | x   |
+|              | every         | Object  | `day`            | x       | x   |
+|              | every         | Object  | `weekday`        | x       | x   |
 |              | every         | Object  | `weekdayOrdinal` |         | x   |
 |              | every         | Object  | `week`           |         | x   |
-|              | every         | Object  | `weekOfMonth`    | x       | x   | x       |
-|              | every         | Object  | `month`          | x       | x   | x       |
+|              | every         | Object  | `weekOfMonth`    | x       | x   |
+|              | every         | Object  | `month`          | x       | x   |
 |              | every         | Object  | `quarter`        |         | x   |
-|              | every         | Object  | `year`           | x       | x   | x       |
-|              | before        | Date    |                  | x       |     | x       |
-|              | after         | Date    |                  | x       |     | x       |
+|              | every         | Object  | `year`           | x       | x   |
+|              | before        | Date    |                  | x       |     |
+|              | after         | Date    |                  | x       |     |
 | Location     |
 |              | center        | Array   | `[lat, long]`    |         | x   |
 |              | radius        | Int     |                  |         | x   |
@@ -297,7 +325,7 @@ The properties depend on the trigger type. Not all of them are supported across 
 
 ## Progress
 
-Notifications can include an animated progress indicator that shows users the status of an ongoing operation.
+Notifications can include an animated progress indicator that shows users the status of an ongoing operation. Android only.
 
 ```js
 cordova.plugins.notification.local.schedule({
@@ -406,41 +434,6 @@ cordova.plugins.notification.local.schedule(toast, callback, scope, { skipPermis
 ```
 
 
-On Android 8, special permissions are required to exit "do not disturb mode" (in case alarmVolume is defined).
-You can check these by using:
-
-```js
-cordova.plugins.notification.local.hasDoNotDisturbPermissions(function (granted) { ... })
-```
-
-... and you can request them by using:
-
-```js
-cordova.plugins.notification.local.requestDoNotDisturbPermissions(function (granted) { ... })
-```
-
-The only downside to not having these permissions granted is that alarmVolume and vibrate may not be
-honored on Android 8+ devices if the device is currently on silent when the notification fires (silent, not vibrate).
-In this situation, the notification will fire silently but still appear in the notification bar.
-
-Also on Android 8, it is helpful for alarms that autolaunch the app with an event, if the app can
-ignore battery saving mode (otherwise alarms won't trigger reliably).  You can check to see if the app is whitelisted for this with the following method.
-
-```js
-cordova.plugins.notification.local.isIgnoringBatteryOptimizations(function (granted) { ... })
-```
-
-... and you can request to be whitelisted by using:
-
-```js
-cordova.plugins.notification.local.requestIgnoreBatteryOptimizations(function (granted) { ... })
-```
-
-The request method here will work one of two ways.
-1. If you have the REQUEST_IGNORE_BATTERY_OPTIMIZATIONS permission defined in the manifest, it will use ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS to explicitly ignore battery optimizations for this app.  This is the best overall user experience, but the REQUEST_IGNORE_BATTERY_OPTIMIZATIONS permission seems to be frowned upon and can get your app banned. This plugin does not have this permission in plugin.xml for this reason, so you will need to use the cordova-custom-config plugin to add it to your config.xml
-2. If you do not have REQUEST_IGNORE_BATTERY_OPTIMIZATIONS requested, it will launch ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS to show a list of all applications.  You will want to put some sort of instructions prior to this to walk the user through this.  Also, this action doesn't exist on all Android devices (is missing on Samsung phones), which will make this method simply return false if it can't start the activity.
-
-
 ## Events
 
 The following events are supported: `add`, `trigger`, `click`, `clear`, `cancel`, `update`, `clearall` and `cancelall`.
@@ -516,10 +509,10 @@ See the sample app for how to use them.
 
 | Method   | Method            | Method          | Method         | Method        | Method           |
 | :------- | :---------------- | :-------------- | :------------- | :------------ | :--------------- |
-| schedule | cancelAll         | isTriggered     | get            | removeActions | un                              |
-| update   | hasPermission     | getType         | getAll         | hasActions    | fireQueuedEvents                |
-| clear    | requestPermission | getIds          | getScheduled   | getDefaults   | requestDoNotDisturbPermissions  |
-| clearAll | isPresent         | getScheduledIds | getTriggered   | setDefaults   | hasDoNotDisturbPermissions      |
+| schedule | cancelAll         | isTriggered     | get            | removeActions | un               |
+| update   | hasPermission     | getType         | getAll         | hasActions    | fireQueuedEvents |
+| clear    | requestPermission | getIds          | getScheduled   | getDefaults   |
+| clearAll | isPresent         | getScheduledIds | getTriggered   | setDefaults   |
 | cancel   | isScheduled       | getTriggeredIds | addActions     | on            |
 
 
