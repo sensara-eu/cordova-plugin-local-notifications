@@ -1,10 +1,6 @@
 {
   "name": "cordova-plugin-local-notification",
-<<<<<<< HEAD
-  "version": "0.9.0-sensara.4",
-=======
-  "version": "1.0.0",
->>>>>>> upstream/master
+  "version": "1.0.0-sensara",
   "description": "Schedules and queries for local notifications",
   "cordova": {
     "id": "cordova-plugin-local-notification",
