@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 /src/windows.old
 /src/windows/Microsoft.Toolkit.Uwp.Notifications.*
 /src/windows/**/.vs
@@ -6,6 +5,3 @@
 /src/windows/**/obj
 .DS_Store
 .idea
-=======
-.DS_Store
->>>>>>> upstream/master
