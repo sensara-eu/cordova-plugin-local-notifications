@@ -245,7 +245,7 @@ public final class Options {
             return channel;
         }
 
-        return Manager.getInstance(context).buildChannelWithOptions(soundUri, shouldVibrate, hasSound, channelName);
+        return Manager.getInstance(context).buildChannelWithOptions(soundUri, shouldVibrate, hasSound, channelName, channelId);
     }
 
     /**
